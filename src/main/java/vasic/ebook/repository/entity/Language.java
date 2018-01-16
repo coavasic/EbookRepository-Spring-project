@@ -1,5 +1,7 @@
 package vasic.ebook.repository.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,7 +12,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="languages")
-public class Language {
+public class Language implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

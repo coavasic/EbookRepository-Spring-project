@@ -1,5 +1,7 @@
 package vasic.ebook.repository.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +14,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="ebooks")
-public class EBook {
+public class EBook implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -47,5 +49,90 @@ public class EBook {
 	@ManyToOne
 	@JoinColumn(name="category_id",referencedColumnName="category_id",nullable=false)
 	private Category category;
+	
+	
+	public EBook() {}
+
+
+	public Integer getId() {
+		return id;
+	}
+
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+	public String getTitle() {
+		return title;
+	}
+
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+
+	public String getAuthor() {
+		return author;
+	}
+
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+
+	public String getKeywords() {
+		return keywords;
+	}
+
+
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
+	}
+
+
+	public Integer getPublicationYear() {
+		return publicationYear;
+	}
+
+
+	public void setPublicationYear(Integer publicationYear) {
+		this.publicationYear = publicationYear;
+	}
+
+
+	public String getFileName() {
+		return fileName;
+	}
+
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+
+	public String getMime() {
+		return mime;
+	}
+
+
+	public void setMime(String mime) {
+		this.mime = mime;
+	}
+
+
+	public Category getCategory() {
+		return category;
+	}
+
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+	
+	
 
 }
