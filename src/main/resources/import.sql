@@ -1,0 +1,8 @@
+INSERT INTO categories (category_name) VALUES ("Strucna literatura")
+INSERT INTO categories (category_name) VALUES ("Stripovi")
+INSERT INTO categories (category_name) VALUES ("Knjige")
+insert INTO languages (language_name) VALUES ("Engleski")
+insert INTO languages (language_name) VALUES ("Nemacki")
+insert INTO languages (language_name) VALUES ("Srpski")
+insert INTO ebooks (title,author,keywords,publication_year,file_name,mime,category_id,language_id) VALUES("Title 1","Author 1","Keywords 1",2015,"file_name","mime 1",1,2)
+insert INTO ebooks (title,author,keywords,publication_year,file_name,mime,category_id,language_id) VALUES("Title 2","Author 2","Keywords 2",2016,"file_name","mime 2",2,3)

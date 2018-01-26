@@ -30,7 +30,7 @@ public class Category implements Serializable{
 	
 	@Size(max=30)
 	@Column(name="category_name")
-	private String categoryId;
+	private String name;
 	
 	public Category() {}
 
@@ -42,12 +42,12 @@ public class Category implements Serializable{
 		this.id = id;
 	}
 
-	public String getCategoryId() {
-		return categoryId;
+	public String getName() {
+		return name;
 	}
 
-	public void setCategoryId(String categoryId) {
-		this.categoryId = categoryId;
+	public void setName(String categoryId) {
+		this.name = categoryId;
 	}
 
 	

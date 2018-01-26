@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="users")
-public class User implements Serializable{
+public class AppUser implements Serializable{
 	/**
 	 * 
 	 */
@@ -50,7 +50,25 @@ public class User implements Serializable{
 	@JoinColumn(name="category_id",referencedColumnName="category_id",nullable=true)
 	private Category category;
 	
-	public User() {}
+	public AppUser() {}
+	
+	
+	
+
+	public AppUser(Integer id, String firstName, String lastName, String userName, String password, String type,
+			Category category) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.userName = userName;
+		this.password = password;
+		this.type = type;
+		this.category = category;
+	}
+
+
+
 
 	public Integer getId() {
 		return id;

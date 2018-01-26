@@ -50,6 +50,10 @@ public class EBook implements Serializable{
 	@JoinColumn(name="category_id",referencedColumnName="category_id",nullable=false)
 	private Category category;
 	
+	@ManyToOne
+	@JoinColumn(name="langueage_id",referencedColumnName="language_id",nullable=false)
+	private Language language;
+	
 	
 	public EBook() {}
 
@@ -132,6 +136,18 @@ public class EBook implements Serializable{
 	public void setCategory(Category category) {
 		this.category = category;
 	}
+
+
+	public Language getLanguage() {
+		return language;
+	}
+
+
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
+	
+	
 	
 	
 
