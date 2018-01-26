@@ -6,6 +6,6 @@ import vasic.ebook.repository.entity.AppUser;
 
 public interface AppUserRepo extends JpaRepository<AppUser, Integer>{
 	
-	AppUser findByUserName(String username);
+	AppUser findByUsername(String username);
 
 }

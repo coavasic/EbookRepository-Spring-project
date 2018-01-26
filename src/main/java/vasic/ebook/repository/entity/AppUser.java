@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+
 @Entity
 @Table(name="users")
 public class AppUser implements Serializable{
@@ -36,35 +38,34 @@ public class AppUser implements Serializable{
 	
 	@Size(max=10)
 	@Column(name="user_name", unique=true, nullable=false)
-	private String userName;
-	
-	@Size(max=10, min=4)
+	private String username;
+
 	@Column(name="password",nullable=false)
 	private String password;
 	
 	@Size(max=30)
-	@Column(name="type",nullable=false)
-	private String type;
+	@Column(name="role",nullable=false)
+	private String role;
 	
-	@ManyToOne
-	@JoinColumn(name="category_id",referencedColumnName="category_id",nullable=true)
-	private Category category;
+//	@ManyToOne
+//	@JoinColumn(name="category_id",referencedColumnName="category_id",nullable=true)
+//	private Category category;
 	
 	public AppUser() {}
 	
 	
 	
 
-	public AppUser(Integer id, String firstName, String lastName, String userName, String password, String type,
-			Category category) {
+	public AppUser(Integer id, String firstName, String lastName, String userName, String password, String type
+			) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.userName = userName;
+		this.username = userName;
 		this.password = password;
-		this.type = type;
-		this.category = category;
+		this.role = type;
+//		this.category = category;
 	}
 
 
@@ -94,12 +95,12 @@ public class AppUser implements Serializable{
 		this.lastName = lastName;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String userName) {
+		this.username = userName;
 	}
 
 	public String getPassword() {
@@ -110,21 +111,21 @@ public class AppUser implements Serializable{
 		this.password = password;
 	}
 
-	public String getType() {
-		return type;
+	public String getRole() {
+		return role;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setRole(String type) {
+		this.role = type;
 	}
 
-	public Category getCategory() {
-		return category;
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
+//	public Category getCategory() {
+//		return category;
+//	}
+//
+//	public void setCategory(Category category) {
+//		this.category = category;
+//	}
 	
 	
 	
