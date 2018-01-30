@@ -47,9 +47,9 @@ public class AppUser implements Serializable{
 	@Column(name="role",nullable=false)
 	private String role;
 	
-//	@ManyToOne
-//	@JoinColumn(name="category_id",referencedColumnName="category_id",nullable=true)
-//	private Category category;
+	@ManyToOne
+	@JoinColumn(name="category_id",referencedColumnName="category_id",nullable=true)
+	private Category category;
 	
 	public AppUser() {}
 	
@@ -57,7 +57,7 @@ public class AppUser implements Serializable{
 	
 
 	public AppUser(Integer id, String firstName, String lastName, String userName, String password, String type
-			) {
+			,Category category) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -65,7 +65,7 @@ public class AppUser implements Serializable{
 		this.username = userName;
 		this.password = password;
 		this.role = type;
-//		this.category = category;
+		this.category = category;
 	}
 
 
@@ -119,13 +119,13 @@ public class AppUser implements Serializable{
 		this.role = type;
 	}
 
-//	public Category getCategory() {
-//		return category;
-//	}
-//
-//	public void setCategory(Category category) {
-//		this.category = category;
-//	}
+	public Category getCategory() {
+		return category;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
 	
 	
 	

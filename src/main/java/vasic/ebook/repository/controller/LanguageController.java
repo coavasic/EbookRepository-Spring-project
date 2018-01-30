@@ -15,13 +15,12 @@ import vasic.ebook.repository.entity.Language;
 import vasic.ebook.repository.service.LanguageService;
 
 @RestController
-@RequestMapping(value="api/languages")
 public class LanguageController {
 	
 	@Autowired
 	private LanguageService languageService;
 	
-	@RequestMapping(value="/all",method=RequestMethod.GET)
+	@RequestMapping(value="open/languages/all",method=RequestMethod.GET)
 	public ResponseEntity<List<Language>>getAllLanguages(){
 		
 		List<Language> langs = new ArrayList<Language>();

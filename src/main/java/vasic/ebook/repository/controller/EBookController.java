@@ -40,7 +40,6 @@ import vasic.ebook.repository.service.EBookService;
 import vasic.ebook.repository.service.LanguageService;
 
 @RestController
-@RequestMapping(value="/api/ebooks")
 public class EBookController {
 
 	@Autowired
@@ -54,7 +53,7 @@ public class EBookController {
 	
 	
 	
-	@RequestMapping(value="/check",method=RequestMethod.POST,consumes = "multipart/form-data")
+	@RequestMapping(value="/api/ebooks/upload",method=RequestMethod.POST,consumes = "multipart/form-data")
 	public ResponseEntity<EBookDTO> checkbeforeUpload(@RequestParam("file") MultipartFile file) throws IOException{
 		
 		System.out.println(file.getOriginalFilename());
@@ -116,7 +115,7 @@ public class EBookController {
 	}
 	
 	
-	@RequestMapping(value="/all",method=RequestMethod.GET)
+	@RequestMapping(value="open/ebooks",method=RequestMethod.GET)
 	public ResponseEntity<List<EBookDTO>> getEbooks(){
 		
 		List<EBookDTO> dtos = new ArrayList<>();
@@ -141,7 +140,7 @@ public class EBookController {
 		
 	}
 	
-	@RequestMapping(value="/{id}",method=RequestMethod.GET)
+	@RequestMapping(value="open/ebooks/{id}",method=RequestMethod.GET)
 	public ResponseEntity<EBookDTO> getById(@PathVariable Integer id){
 		
 		EBook book = eBookService.findOne(id);
@@ -159,7 +158,7 @@ public class EBookController {
 		
 	}
 	
-	@RequestMapping(value="/dodaj",method=RequestMethod.POST,consumes="application/json")
+	@RequestMapping(value="api/ebooks/dodaj",method=RequestMethod.POST,consumes="application/json")
 	public ResponseEntity<EBookDTO> saveEbook(@RequestBody EBookDTO bookDTO) throws ParseException, IOException{
 		
 		PDFHandler handler = new PDFHandler();
@@ -205,7 +204,7 @@ public class EBookController {
 	}
 	
 	
-	@RequestMapping(value="/download/{filePath}",method=RequestMethod.GET)
+	@RequestMapping(value="api/ebooks/download/{filePath}",method=RequestMethod.GET)
 	public ResponseEntity<?> download(@PathVariable String filePath) throws IOException{
 		
         String fileLocation1= new File("books").getAbsolutePath()+"\\"+filePath+".pdf";
@@ -236,7 +235,7 @@ public class EBookController {
 	}
 	
 	
-	@RequestMapping(value="/bycategory/{id}")
+	@RequestMapping(value="open/ebooks/bycategory/{id}")
 	public ResponseEntity<List<EBookDTO>> getEbookByCat(@PathVariable Integer id){
 		
 		
@@ -255,7 +254,7 @@ public class EBookController {
 		
 	}
 	
-	@RequestMapping(value="/delete/{id}",method=RequestMethod.DELETE)
+	@RequestMapping(value="api/ebooks/delete/{id}",method=RequestMethod.DELETE)
 	public ResponseEntity<?> deleteEbook(@PathVariable Integer id){
 		
 		EBook eBook = eBookService.findOne(id);
@@ -276,7 +275,7 @@ public class EBookController {
 		}
 	}
 	
-	@RequestMapping(value="update/{id}",method=RequestMethod.PUT)
+	@RequestMapping(value="api/ebooks/update/{id}",method=RequestMethod.PUT)
 	public ResponseEntity<EBookDTO> updateEbook(@RequestBody EBookDTO bookDTO,@PathVariable Integer id){
 		
 		
