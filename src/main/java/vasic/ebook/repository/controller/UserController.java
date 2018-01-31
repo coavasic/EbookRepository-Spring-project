@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import vasic.ebook.repository.dto.AppUserDTO;
@@ -81,13 +82,13 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="my-role",method=RequestMethod.GET)
-	public String myRole() {
+	public ResponseEntity<String> myRole() {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = auth.getPrincipal().toString();
 		AppUser appUser = userRepo.findByUsername(username);
 		
-		return appUser.getRole();
+		return new ResponseEntity<String>(appUser.getRole(),HttpStatus.OK);
 		
 	}
 	
