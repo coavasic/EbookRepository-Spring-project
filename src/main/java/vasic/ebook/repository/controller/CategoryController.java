@@ -55,6 +55,21 @@ public class CategoryController {
 		
 	}
 	
+	@RequestMapping(value="api/categories/edit")
+	public ResponseEntity<Category> update(@RequestBody Category category){
+		
+		Category oldCategory = categoryService.findOne(category.getId());
+		if(oldCategory!=null) {
+		oldCategory.setName(category.getName());
+		
+		return new ResponseEntity<Category>(this.categoryService.save(oldCategory),HttpStatus.OK);
+		}else {
+			
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+	}
+	
 
 	
 }
