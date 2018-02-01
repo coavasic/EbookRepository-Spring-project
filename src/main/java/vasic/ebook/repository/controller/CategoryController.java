@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,7 +56,7 @@ public class CategoryController {
 		
 	}
 	
-	@RequestMapping(value="api/categories/edit",method=RequestMethod.PUT)
+	@RequestMapping(value="api/categories/edit")
 	public ResponseEntity<Category> update(@RequestBody Category category){
 		
 		Category oldCategory = categoryService.findOne(category.getId());
@@ -70,6 +71,19 @@ public class CategoryController {
 		
 	}
 	
+	
+	@RequestMapping(value="api/categories/delete/{id}")
+	public ResponseEntity<?> delete(@PathVariable Integer id){
+		
+		if(categoryService.findOne(id)!=null) {
+			
+			categoryService.delete(id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+	}
 
 	
 }
