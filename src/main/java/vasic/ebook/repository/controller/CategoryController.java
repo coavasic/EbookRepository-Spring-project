@@ -55,7 +55,7 @@ public class CategoryController {
 		
 	}
 	
-	@RequestMapping(value="api/categories/edit")
+	@RequestMapping(value="api/categories/edit",method=RequestMethod.PUT)
 	public ResponseEntity<Category> update(@RequestBody Category category){
 		
 		Category oldCategory = categoryService.findOne(category.getId());
