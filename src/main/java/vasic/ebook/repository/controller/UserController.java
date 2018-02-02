@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,12 +50,13 @@ public class UserController {
 		
 		
 		AppUser user = new AppUser();
-		
+
 		user.setFirstName(userDTO.getFirstName());
 		user.setLastName(userDTO.getLastName());
 		user.setUsername(userDTO.getUsername());
+		System.out.println(userDTO.getPassword());
 		user.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
-		user.setRole(userDTO.getRole());
+		user.setRole("user");
 		if(userDTO.getCategoryId()==0) {
 			user.setCategory(null);
 		}else {
@@ -108,12 +110,24 @@ public class UserController {
 		}
 		
 		return new ResponseEntity<List<AppUserDTO>>(usersDTO,HttpStatus.OK);
+			
 		
 		
+	}
+	
+	@RequestMapping(value="/api/promote/{username}",method=RequestMethod.GET)
+	public ResponseEntity<?> promote(@PathVariable String username){
 		
-		
-		
-		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String myUsername = auth.getPrincipal().toString();
+		if(!username.equals(myUsername)) {
+			AppUser user = userRepo.findByUsername(username);
+			user.setRole("admin");
+			userRepo.save(user);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		}			
 	}
 	
 

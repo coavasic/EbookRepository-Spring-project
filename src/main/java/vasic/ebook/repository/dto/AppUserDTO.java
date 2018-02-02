@@ -71,7 +71,7 @@ public class AppUserDTO {
 		this.username = username;
 	}
 	
-	@JsonIgnore
+	
 	public String getPassword() {
 		return password;
 	}
