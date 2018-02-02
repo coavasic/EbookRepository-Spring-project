@@ -1,26 +1,16 @@
 package vasic.ebook.repository.search;
 
 
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.FuzzyQuery;
-import org.apache.lucene.search.PhraseQuery;
-import org.apache.lucene.search.PrefixQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TermRangeQuery;
-import org.apache.lucene.util.BytesRef;
+import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.index.query.QueryBuilders;
 
-import vasic.ebook.repository.analysers.SerbianAnalyzer;
 import vasic.ebook.repository.lucene.model.SearchType;
-
 
 
 
 public class QueryBuilder {
 	
-	private static SerbianAnalyzer analyzer = new SerbianAnalyzer();
 	private static int maxEdits = 1;
 	
 	public static int getMaxEdits(){
@@ -31,8 +21,7 @@ public class QueryBuilder {
 		QueryBuilder.maxEdits = maxEdits;
 	}
 	
-	public static Query buildQuery(SearchType queryType, String field, String value) throws IllegalArgumentException, ParseException{
-		QueryParser parser = new QueryParser(field, analyzer);
+	public static org.elasticsearch.index.query.QueryBuilder buildQuery(SearchType queryType, String field, String value) throws IllegalArgumentException, ParseException{
 		String errorMessage = "";
 		if(field == null || field.equals("")){
 			errorMessage += "Field not specified";
@@ -45,30 +34,21 @@ public class QueryBuilder {
 			throw new IllegalArgumentException(errorMessage);
 		}
 		
-		Query query = null;
+		org.elasticsearch.index.query.QueryBuilder retVal = null;
 		if(queryType.equals(SearchType.regular)){
-			Term term = new Term(field, value);
-			query = new TermQuery(term);
+			retVal = QueryBuilders.termQuery(field, value);
 		}else if(queryType.equals(SearchType.fuzzy)){
-			Term term = new Term(field, value);
-			query = new FuzzyQuery(term, maxEdits);
+			retVal = QueryBuilders.fuzzyQuery(field, value).fuzziness(Fuzziness.fromEdits(maxEdits));
 		}else if(queryType.equals(SearchType.prefix)){
-			Term term = new Term(field, value);
-			query = new PrefixQuery(term);
+			retVal = QueryBuilders.prefixQuery(field, value);
 		}else if(queryType.equals(SearchType.range)){
 			String[] values = value.split(" ");
-			query = new TermRangeQuery(field, new BytesRef(values[0]), new BytesRef(values[1]), true, true);
+			retVal = QueryBuilders.rangeQuery(field).from(values[0]).to(values[1]);
 		}else{
-			String[] values = value.split(" ");
-			PhraseQuery.Builder builder = new PhraseQuery.Builder();
-			for(String word : values){
-				Term term = new Term(field, word);
-				builder.add(term);
-			}
-			query = builder.build();
+			retVal = QueryBuilders.matchPhraseQuery(field, value);
 		}
 		
-		return parser.parse(query.toString(field));
+		return retVal;
 	}
 
 }

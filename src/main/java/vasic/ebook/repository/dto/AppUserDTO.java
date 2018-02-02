@@ -1,5 +1,7 @@
 package vasic.ebook.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import vasic.ebook.repository.entity.AppUser;
 
 public class AppUserDTO {
@@ -68,6 +70,8 @@ public class AppUserDTO {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+	
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}

@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.ResourceBundle;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +18,15 @@ import vasic.ebook.repository.indexer.Indexer;
 
 
 @RestController
-@RequestMapping(value="api/index")
+@RequestMapping(value="open")
 public class IndexController {
 	
 	private static String DATA_DIR_PATH;
+	
+	@Autowired
+	private Indexer indexer;
+	
+
 	
 	static {
 		ResourceBundle rb=ResourceBundle.getBundle("application");
@@ -31,7 +37,7 @@ public class IndexController {
 	public ResponseEntity<String> index() throws IOException {
 		File dataDir = new File("books");
 		long start = new Date().getTime();
-		int numIndexed = Indexer.getInstance().index(dataDir);
+		int numIndexed = indexer.index(dataDir);
 		long end = new Date().getTime();
 		String text = "Indexing " + numIndexed + " files took "
 				+ (end - start) + " milliseconds";

@@ -49,7 +49,7 @@ public class PDFHandler extends DocumentHandler {
 			String keywords = info.getKeywords();
 			
 		
-			retVal.setMime(info.getCustomMetadataValue("mime"));
+
 		
 			
 			
@@ -89,8 +89,6 @@ public class PDFHandler extends DocumentHandler {
 			pdf.getDocumentInformation().setAuthor(bookDTO.getAuthor());
 			pdf.getDocumentInformation().setCreationDate(cal);
 			pdf.getDocumentInformation().setKeywords(bookDTO.getKeywords());
-			System.out.println(bookDTO.getMime() + "PROVERA MIME");
-			pdf.getDocumentInformation().setCustomMetadataValue("mime", bookDTO.getMime());
 			
 			
 		} catch (IOException e) {

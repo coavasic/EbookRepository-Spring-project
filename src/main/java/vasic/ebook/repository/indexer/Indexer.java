@@ -20,141 +20,51 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 
 import vasic.ebook.repository.analysers.SerbianAnalyzer;
 import vasic.ebook.repository.lucene.indexing.handlers.DocumentHandler;
 import vasic.ebook.repository.lucene.indexing.handlers.PDFHandler;
+import vasic.ebook.repository.lucene.model.IndexUnit;
+import vasic.ebook.repository.repository.BookRepository;
 
 
-
+@Service
 public class Indexer {
 	
-	private File indexDirPath;
-	private IndexWriter indexWriter;
-	private Directory indexDir;
+
+	@Autowired
+	private BookRepository repository;
 	
-	private static Indexer indexer = new Indexer(true);
-	
-	public static Indexer getInstance(){
-		return indexer;
+	public Indexer() {
 	}
 	
-	/**
-	 * @param path - kanonicka adresa direktorijuma u koji ce biti smesteni indeksi
-	 * @param restart - <b>true</b> za kreiranje novog indeksa, <b>false</b> za nastavak koriscenja vec postojecih indeksa
-	 */
-	private Indexer(String path, boolean restart) {
-		System.out.println("PATH: " + path);
-		IndexWriterConfig iwc = new IndexWriterConfig(new SerbianAnalyzer());
-		if(restart){
-			iwc.setOpenMode(OpenMode.CREATE);
-		}else{
-			iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
-		}
-		
-		try{
-			this.indexDir = new SimpleFSDirectory(FileSystems.getDefault().getPath(path));
-			this.indexWriter = new IndexWriter(this.indexDir, iwc);
-		}catch(IOException ioe){
-			throw new IllegalArgumentException("Path not correct");
-		}
-		
-	}
 	
-	/**
-	 * @param restart - <b>true</b> za kreiranje novog indeksa, <b>false</b> za nastavak koriscenja vec postojecih indeksa
-	 * <p>
-	 * Direktorijum u kojem ce se indeks nalaziti se ucitava iz <i>app.properties</i> datoteke
-	 */
-	private Indexer(boolean restart){
-		this(ResourceBundle.getBundle("application").getString("index"), restart);
-	}
-	
-	private Indexer(){
-		this(false);
-	}
-	
-	public IndexWriter getIndexWriter(){
-		return this.indexWriter;
-	}
-	
-	public Directory getIndexDir(){
-		return indexDir;
-	}
-	
-	public File getIndexDirPath(){
-		return indexDirPath;
-	}
-	
-	/**
-	 * Od dobijenih vrednosti se konstruise Term po kojem se vrsi pretraga dokumenata
-	 * Dokumenti koji zadovoljavaju uslove pretrage ce biti obrisani
-	 * 
-	 * @param fieldName naziv polja
-	 * @param value vrednost polja
-	 * @return
-	 */
 	public boolean delete(String filename){
-		Term delTerm = new Term("filename", filename);
-		try {
-			synchronized (this) {
-				this.indexWriter.deleteDocuments(delTerm);
-				this.indexWriter.commit();
-			}
+		if(repository.equals(filename)){
+			repository.delete(filename);
 			return true;
-		} catch (IOException e) {
+		} else
 			return false;
-		}
-	}
-	
-	public boolean add(Document doc){
-		try {
-			synchronized (this) {
-				this.indexWriter.addDocument(doc);
-				this.indexWriter.commit();
-			}
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
 		
 	}
 	
-	public boolean updateDocument(String filename, List<IndexableField> fields){		
-		try {
-			DirectoryReader reader = DirectoryReader.open(this.indexDir);
-			IndexSearcher is = new IndexSearcher(reader);
-			Query query = new TermQuery(new Term("filename", filename));
-			TopScoreDocCollector collector = TopScoreDocCollector.create(10	);
-			is.search(query, collector);
-			
-			ScoreDoc[] scoreDocs = collector.topDocs().scoreDocs;
-			if(scoreDocs.length > 0){
-				int docID = scoreDocs[0].doc;
-				Document doc = is.doc(docID);
-				if(doc != null){
-					for(IndexableField field : fields){
-						doc.removeFields(field.name());
-					}
-					for(IndexableField field : fields){
-						doc.add(field);
-					}
-					try{
-						synchronized (this) {
-							this.indexWriter.updateDocument(new Term("filename", filename), doc);
-							this.indexWriter.commit();
-							return true;
-						}
-					}catch(IOException e){
-					}
-				}
-			}
-			
+	public boolean update(IndexUnit unit){
+		unit = repository.save(unit);
+		if(unit!=null)
+			return true;
+		else
 			return false;
-			
-		} catch (IOException e) {
-			throw new IllegalArgumentException("Indeksni direktorijum nije u redu");
-		} 
+	}
+	
+	public boolean add(IndexUnit unit){
+		unit = repository.index(unit);
+		if(unit!=null)
+			return true;
+		else
+			return false;
 	}
 	
 	/**
@@ -164,6 +74,7 @@ public class Indexer {
 	public int index(File file){		
 		DocumentHandler handler = null;
 		String fileName = null;
+		int retVal = 0;
 		try {
 			File[] files;
 			if(file.isDirectory()){
@@ -179,29 +90,28 @@ public class Indexer {
 					if(handler == null){
 						System.out.println("Nije moguce indeksirati dokument sa nazivom: " + fileName);
 						continue;
-					}
-					this.indexWriter.addDocument(handler.getIndexUnit(newFile).getLuceneDocument());
+					}	
+					if(add(handler.getIndexUnit(newFile)))
+						retVal++;
 				} else if (newFile.isDirectory()){
-					index(newFile);
+					retVal += index(newFile);
 				}
 			}
-			this.indexWriter.commit();
 			System.out.println("indexing done");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			System.out.println("indexing NOT done");
 		}
-		return this.indexWriter.numDocs();
+		return retVal;
 	}
 	
-	protected void finalize() throws Throwable {
-		this.indexWriter.close();
-	}
-	
+
 	public DocumentHandler getHandler(String fileName){
-
-	
+ if(fileName.endsWith(".pdf")){
 			return new PDFHandler();
-
+ 		}
+ 	
+ 	return null;
+ 
 	}
 
 }

@@ -93,7 +93,6 @@ public class EBookController {
 			ebook.setKeywords(indexUnit.getKeywords());
 			ebook.setAuthor(indexUnit.getAuthor());
 			ebook.setFileName(file.getOriginalFilename());
-			ebook.setMime(indexUnit.getMime());
 			
 			
 
@@ -177,7 +176,6 @@ public class EBookController {
 		
 		PDDocument doc = handler.setAttributes(pdfFile,bookDTO);
 		
-		System.out.println(doc.getDocumentInformation().getCustomMetadataValue("mime"));
 		
 		File f = new File(fileLocation1);
 		FileOutputStream fOut = new FileOutputStream(f);
@@ -196,7 +194,6 @@ public class EBookController {
 		book.setKeywords(bookDTO.getKeywords());
 		book.setFileName(bookDTO.getFileName());
 		book.setCategory(category);
-		book.setMime(bookDTO.getMime());
 		book.setLanguage(language);
 		
 		return new ResponseEntity<EBookDTO>(new EBookDTO(eBookService.save(book)),HttpStatus.OK);
@@ -275,7 +272,7 @@ public class EBookController {
 		}
 	}
 	
-	@RequestMapping(value="api/ebooks/update/{id}",method=RequestMethod.PUT)
+	@RequestMapping(value="api/ebooks/update/{id}")
 	public ResponseEntity<EBookDTO> updateEbook(@RequestBody EBookDTO bookDTO,@PathVariable Integer id){
 		
 		
@@ -286,9 +283,7 @@ public class EBookController {
 			ebook.setTitle(bookDTO.getTitle());
 			ebook.setAuthor(bookDTO.getAuthor());
 			ebook.setKeywords(bookDTO.getKeywords());
-			ebook.setPublicationYear(bookDTO.getPublicationYear());
-			ebook.setMime(bookDTO.getMime());
-			
+			ebook.setPublicationYear(bookDTO.getPublicationYear());			
 			return new ResponseEntity<EBookDTO>(new EBookDTO(eBookService.save(ebook)),HttpStatus.OK);
 			
 		}else {

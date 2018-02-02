@@ -42,9 +42,6 @@ public class EBook implements Serializable{
 	@Column(name="file_name")
 	private String fileName;
 	
-	@Size(max=100)
-	@Column(name="mime")
-	private String mime;
 	
 	@ManyToOne
 	@JoinColumn(name="category_id",referencedColumnName="category_id",nullable=false)
@@ -117,15 +114,6 @@ public class EBook implements Serializable{
 		this.fileName = fileName;
 	}
 
-
-	public String getMime() {
-		return mime;
-	}
-
-
-	public void setMime(String mime) {
-		this.mime = mime;
-	}
 
 
 	public Category getCategory() {

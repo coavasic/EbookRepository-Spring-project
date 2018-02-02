@@ -15,29 +15,12 @@ public class EBookDTO implements Serializable{
 	private String keywords;
 	private Integer publicationYear;
 	private String fileName;
-	private String mime;
 	private Integer categoryId;
 	private Integer languageId;
 	
 	public EBookDTO() {}
 
-	public EBookDTO(Integer id, String title, String author, String keywords, Integer publicationYear, String fileName,
-			String mime, Integer categoryId,Integer languageId) {
-		super();
-		this.id = id;
-		this.title = title;
-		this.author = author;
-		this.keywords = keywords;
-		this.publicationYear = publicationYear;
-		
-		
-		this.fileName = fileName;
-		
-		this.mime = mime;
-		this.categoryId = categoryId;
-		this.languageId=languageId;
-	}
-	
+
 	public EBookDTO(EBook book) {
 		
 		this.id = book.getId();
@@ -46,7 +29,6 @@ public class EBookDTO implements Serializable{
 		this.keywords = book.getKeywords();
 		this.publicationYear = book.getPublicationYear();
 		this.fileName = book.getFileName();
-		this.mime = book.getMime();
 		this.categoryId = book.getCategory().getId();
 		this.languageId=book.getLanguage().getId();
 		
@@ -100,13 +82,6 @@ public class EBookDTO implements Serializable{
 		this.fileName = fileName;
 	}
 
-	public String getMime() {
-		return mime;
-	}
-
-	public void setMime(String mime) {
-		this.mime = mime;
-	}
 
 	public Integer getCategoryId() {
 		return categoryId;

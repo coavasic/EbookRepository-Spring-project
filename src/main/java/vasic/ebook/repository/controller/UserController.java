@@ -1,5 +1,8 @@
 package vasic.ebook.repository.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,8 +90,29 @@ public class UserController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = auth.getPrincipal().toString();
 		AppUser appUser = userRepo.findByUsername(username);
-		
 		return new ResponseEntity<String>(appUser.getRole(),HttpStatus.OK);
+		
+	}
+	
+	@RequestMapping(value="/api/users",method=RequestMethod.GET)
+	public ResponseEntity<List<AppUserDTO>> getUsers(){
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String myUsername = auth.getPrincipal().toString();
+		List<AppUserDTO> usersDTO = new ArrayList<AppUserDTO>();
+		List<AppUser> users = userRepo.findAll();
+		for(AppUser user:users) {
+			if(!user.getUsername().equals(myUsername)) {
+				usersDTO.add(new AppUserDTO(user));
+			}
+		}
+		
+		return new ResponseEntity<List<AppUserDTO>>(usersDTO,HttpStatus.OK);
+		
+		
+		
+		
+		
 		
 	}
 	
