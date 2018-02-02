@@ -130,5 +130,22 @@ public class UserController {
 		}			
 	}
 	
+	@RequestMapping(value="/api/user/delete/{username}")
+	public ResponseEntity<?> delete(@PathVariable String username){
+		
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String myUsername = auth.getPrincipal().toString();
+		if(!username.equals(myUsername)) {
+			AppUser user = userRepo.findByUsername(username);
+			userRepo.delete(user);
+			return new ResponseEntity<>(HttpStatus.OK);			
+		}else {
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		}
+		
+		
+	}
+	
 
 }
