@@ -55,21 +55,12 @@ public class EBookController {
 	
 	@RequestMapping(value="/api/ebooks/upload",method=RequestMethod.POST,consumes = "multipart/form-data")
 	public ResponseEntity<EBookDTO> checkbeforeUpload(@RequestParam("file") MultipartFile file) throws IOException{
-		
-		System.out.println(file.getOriginalFilename());
-		System.out.println(file.getOriginalFilename().length());
-		//System.out.println(file.getOriginalFilename().substring(-3));
-
-		
-		String ludiString= file.getOriginalFilename().substring(file.getOriginalFilename().length()-3,file.getOriginalFilename().length());
-		System.out.println(ludiString);
-		
-		if(file.getOriginalFilename().substring(file.getOriginalFilename().length() -3, file.getOriginalFilename().length()).equals("pdf")) {
+				
+		if(file.getOriginalFilename().endsWith("pdf")) {
 			
 			EBookDTO ebook = new EBookDTO();
 			
 			
-
 	        String fileLocation= new File("data").getAbsolutePath()+"\\"+file.getOriginalFilename();
 
 			if (! file.isEmpty()) {
@@ -80,10 +71,6 @@ public class EBookController {
 			}
 			File pdfFile = new File(fileLocation);
 
-			
-
-			
-			
 			PDFHandler handler = new PDFHandler();
 			IndexUnit indexUnit = handler.getIndexUnit(pdfFile);
 			System.out.println(indexUnit.getFiledate());
@@ -95,22 +82,11 @@ public class EBookController {
 			ebook.setFileName(file.getOriginalFilename());
 			
 			
-
-			
 			return new ResponseEntity<EBookDTO>(ebook,HttpStatus.OK);
-			
-			
-			
-		}
-		
-		else {
-			
+		}		
+		else {			
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		
-
-		
-		
 	}
 	
 	
@@ -121,11 +97,8 @@ public class EBookController {
 
 		List<EBook> ebooks = eBookService.findAll();
 		for (EBook eBook : ebooks) {
-			
-			
 			System.out.println(eBook.getAuthor());
-			dtos.add(new EBookDTO(eBook));
-			
+			dtos.add(new EBookDTO(eBook));	
 		}	
 			
 		if(ebooks.isEmpty()) {
@@ -134,9 +107,7 @@ public class EBookController {
 		}
 		
 		return new ResponseEntity<List<EBookDTO>>(dtos,HttpStatus.OK);
-		
-			
-		
+
 	}
 	
 	@RequestMapping(value="open/ebooks/{id}",method=RequestMethod.GET)
