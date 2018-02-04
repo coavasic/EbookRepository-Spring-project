@@ -259,10 +259,6 @@ public class EBookController {
 		if(ebook != null) {
 			
 	        String fileLocation1= new File("books").getAbsolutePath()+"\\"+bookDTO.getFileName();
-
-
-
-			
 			File pdfFile = new File(fileLocation1);
 			try {
 			PDDocument doc = handler.setAttributes(pdfFile,bookDTO);
