@@ -2,6 +2,8 @@ package vasic.ebook.repository.lucene.indexing.handlers;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.queries.function.valuesource.IfFunction;
 import org.apache.pdfbox.io.RandomAccessFile;
@@ -19,6 +22,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 
 import vasic.ebook.repository.dto.EBookDTO;
 import vasic.ebook.repository.entity.EBook;
+import vasic.ebook.repository.filters.CyrillicLatinConverter;
 import vasic.ebook.repository.lucene.model.IndexUnit;
 
 
@@ -31,8 +35,9 @@ public class PDFHandler extends DocumentHandler {
 		try {
 			PDFParser parser = new PDFParser(new RandomAccessFile(file, "r"));
 			parser.parse();
-			String text = getText(parser);
+			String text = Normalizer.normalize(CyrillicLatinConverter.cir2lat(getText(parser)),Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 			retVal.setText(text);
+			System.out.println(text);
 
 			// metadata extraction
 			PDDocument pdf = parser.getPDDocument();

@@ -64,7 +64,9 @@ public class ResultRetriever {
 			String[] strings = fullFileName.split("\\\\");
 			String fileName = strings[strings.length - 1];
 			EBook ebook = ebookRepo.findByFileName(fileName);
+			if(ebook!=null) {
 			dtos.add(new EBookDTO(ebook));
+			}
 		}
 		
 		return dtos;

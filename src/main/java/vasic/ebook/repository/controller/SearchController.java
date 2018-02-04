@@ -1,5 +1,7 @@
 package vasic.ebook.repository.controller;
 
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vasic.ebook.repository.dto.EBookDTO;
 import vasic.ebook.repository.entity.EBook;
+import vasic.ebook.repository.filters.CyrillicLatinConverter;
 import vasic.ebook.repository.lucene.model.AdvancedQuery;
 import vasic.ebook.repository.lucene.model.RequiredHighlight;
 import vasic.ebook.repository.lucene.model.SearchType;
@@ -28,7 +31,7 @@ import vasic.ebook.repository.search.ResultRetriever;
 
 
 @RestController
-@RequestMapping(value="/api")
+@RequestMapping(value="open")
 public class SearchController {
 
 	
@@ -40,7 +43,7 @@ public class SearchController {
 
 	@PostMapping(value="/search/term", consumes="application/json")
 	public ResponseEntity<List<EBookDTO>> searchTermQuery(@RequestBody SimpleQuery simpleQuery) throws Exception {		
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.regular, simpleQuery.getField(), simpleQuery.getValue());
+		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.regular, simpleQuery.getField(), normalize(simpleQuery.getValue()));
 		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
 		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
 		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
@@ -49,7 +52,7 @@ public class SearchController {
 	
 	@PostMapping(value="/search/fuzzy", consumes="application/json")
 	public ResponseEntity<List<EBookDTO>> searchFuzzy(@RequestBody SimpleQuery simpleQuery) throws Exception {
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.fuzzy, simpleQuery.getField(), simpleQuery.getValue());
+		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.fuzzy, simpleQuery.getField(), normalize(simpleQuery.getValue()));
 		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
 		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
 		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
@@ -58,7 +61,7 @@ public class SearchController {
 	
 	@PostMapping(value="/search/prefix", consumes="application/json")
 	public ResponseEntity<List<EBookDTO>> searchPrefix(@RequestBody SimpleQuery simpleQuery) throws Exception {
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.prefix, simpleQuery.getField(), simpleQuery.getValue());
+		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.prefix, simpleQuery.getField(), normalize(simpleQuery.getValue()));
 		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
 		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
 		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
@@ -67,7 +70,7 @@ public class SearchController {
 	
 	@PostMapping(value="/search/range", consumes="application/json")
 	public ResponseEntity<List<EBookDTO>> searchRange(@RequestBody SimpleQuery simpleQuery) throws Exception {
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.range, simpleQuery.getField(), simpleQuery.getValue());
+		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.range, simpleQuery.getField(), normalize(simpleQuery.getValue()));
 		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
 		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
 		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
@@ -76,7 +79,7 @@ public class SearchController {
 	
 	@PostMapping(value="/search/phrase", consumes="application/json")
 	public ResponseEntity<List<EBookDTO>> searchPhrase(@RequestBody SimpleQuery simpleQuery) throws Exception {
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.phrase, simpleQuery.getField(), simpleQuery.getValue());
+		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.phrase, simpleQuery.getField(), normalize(simpleQuery.getValue()));
 		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
 		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
 		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
@@ -115,4 +118,9 @@ public class SearchController {
 		return new ResponseEntity<List<EBookDTO>>(ebooks, HttpStatus.OK);
 	}		
 	
+	private String normalize(String input) {
+		
+		return Normalizer.normalize(CyrillicLatinConverter.cir2lat(input),Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+
+	}
 }

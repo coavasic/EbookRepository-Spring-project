@@ -33,6 +33,7 @@ import vasic.ebook.repository.dto.EBookDTO;
 import vasic.ebook.repository.entity.Category;
 import vasic.ebook.repository.entity.EBook;
 import vasic.ebook.repository.entity.Language;
+import vasic.ebook.repository.indexer.Indexer;
 import vasic.ebook.repository.lucene.indexing.handlers.PDFHandler;
 import vasic.ebook.repository.lucene.model.IndexUnit;
 import vasic.ebook.repository.service.CategoryService;
@@ -50,6 +51,9 @@ public class EBookController {
 	
 	@Autowired
 	private LanguageService languageService;
+	
+	@Autowired
+	private Indexer indexer;
 	
 	
 	
@@ -147,6 +151,7 @@ public class EBookController {
 		
 		PDDocument doc = handler.setAttributes(pdfFile,bookDTO);
 		
+		indexer.add(handler.getIndexUnit(pdfFile));
 		
 		File f = new File(fileLocation1);
 		FileOutputStream fOut = new FileOutputStream(f);
@@ -222,7 +227,7 @@ public class EBookController {
 		
 	}
 	
-	@RequestMapping(value="api/ebooks/delete/{id}",method=RequestMethod.DELETE)
+	@RequestMapping(value="api/ebooks/delete/{id}",method=RequestMethod.GET)
 	public ResponseEntity<?> deleteEbook(@PathVariable Integer id){
 		
 		EBook eBook = eBookService.findOne(id);
@@ -230,6 +235,7 @@ public class EBookController {
         
 			String fileLocation1= new File("books").getAbsolutePath()+"\\"+eBook.getFileName();
 			File pdfFile = new File(fileLocation1);
+			indexer.delete(eBook.getFileName());
 			pdfFile.delete();
 
 			eBookService.remove(id);
@@ -246,10 +252,32 @@ public class EBookController {
 	@RequestMapping(value="api/ebooks/update/{id}")
 	public ResponseEntity<EBookDTO> updateEbook(@RequestBody EBookDTO bookDTO,@PathVariable Integer id){
 		
+		PDFHandler handler = new PDFHandler();
 		
 		EBook ebook = eBookService.findOne(id);
 		
 		if(ebook != null) {
+			
+	        String fileLocation1= new File("books").getAbsolutePath()+"\\"+bookDTO.getFileName();
+
+
+
+			
+			File pdfFile = new File(fileLocation1);
+			try {
+			PDDocument doc = handler.setAttributes(pdfFile,bookDTO);
+			
+			indexer.update(handler.getIndexUnit(pdfFile));
+			
+			File f = new File(fileLocation1);
+			FileOutputStream fOut = new FileOutputStream(f);
+			doc.save(fOut);
+			doc.close();
+			
+			
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
 			
 			ebook.setTitle(bookDTO.getTitle());
 			ebook.setAuthor(bookDTO.getAuthor());
