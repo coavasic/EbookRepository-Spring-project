@@ -25,7 +25,6 @@ public class CategoryController {
 	@Autowired
 	CategoryService categoryService;
 	
-	//@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="open/categories/all",method=RequestMethod.GET)
 	public ResponseEntity<List<Category>> getCategories(){
 		
@@ -38,15 +37,6 @@ public class CategoryController {
 		
 	}
 	
-	@RequestMapping(value="open/username")
-	public String getLoged() {
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		System.out.println(auth.getPrincipal());
-		
-		return auth.getPrincipal().toString();
-		
-	}
 	
 	
 	@RequestMapping(value="api/categories/add",method=RequestMethod.POST)
@@ -56,6 +46,7 @@ public class CategoryController {
 		
 	}
 	
+	@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="api/categories/edit")
 	public ResponseEntity<Category> update(@RequestBody Category category){
 		
@@ -71,7 +62,7 @@ public class CategoryController {
 		
 	}
 	
-	
+	@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="api/categories/delete/{id}")
 	public ResponseEntity<?> delete(@PathVariable Integer id){
 		

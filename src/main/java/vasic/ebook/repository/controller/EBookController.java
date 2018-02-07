@@ -22,6 +22,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,12 +32,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import vasic.ebook.repository.dto.EBookDTO;
+import vasic.ebook.repository.entity.AppUser;
 import vasic.ebook.repository.entity.Category;
 import vasic.ebook.repository.entity.EBook;
 import vasic.ebook.repository.entity.Language;
 import vasic.ebook.repository.indexer.Indexer;
 import vasic.ebook.repository.lucene.indexing.handlers.PDFHandler;
 import vasic.ebook.repository.lucene.model.IndexUnit;
+import vasic.ebook.repository.repository.AppUserRepo;
+import vasic.ebook.repository.repository.EBookRepo;
 import vasic.ebook.repository.service.CategoryService;
 import vasic.ebook.repository.service.EBookService;
 import vasic.ebook.repository.service.LanguageService;
@@ -55,8 +60,14 @@ public class EBookController {
 	@Autowired
 	private Indexer indexer;
 	
+	@Autowired
+	private AppUserRepo userRepo;
+	
+	@Autowired
+	private EBookRepo  ebookRepo;
 	
 	
+	@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="/api/ebooks/upload",method=RequestMethod.POST,consumes = "multipart/form-data")
 	public ResponseEntity<EBookDTO> checkbeforeUpload(@RequestParam("file") MultipartFile file) throws IOException{
 				
@@ -132,6 +143,7 @@ public class EBookController {
 		
 	}
 	
+	
 	@RequestMapping(value="api/ebooks/dodaj",method=RequestMethod.POST,consumes="application/json")
 	public ResponseEntity<EBookDTO> saveEbook(@RequestBody EBookDTO bookDTO) throws ParseException, IOException{
 		
@@ -183,10 +195,13 @@ public class EBookController {
         String fileLocation1= new File("books").getAbsolutePath()+"\\"+filePath+".pdf";
         
         System.out.println(filePath);
-
+        EBook ebook = ebookRepo.findByFileName(filePath + ".pdf");
+        
+        AppUser user = userRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        
 		
 		Path path = Paths.get(fileLocation1);
-		if(new File(fileLocation1).exists()) {
+		if(new File(fileLocation1).exists() && (user.getRole().equalsIgnoreCase("admin") || user.getCategory().getId() == ebook.getCategory().getId())) {
 			
 			byte[] content = Files.readAllBytes(path);
 			
@@ -227,6 +242,7 @@ public class EBookController {
 		
 	}
 	
+	@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="api/ebooks/delete/{id}",method=RequestMethod.GET)
 	public ResponseEntity<?> deleteEbook(@PathVariable Integer id){
 		
@@ -249,6 +265,7 @@ public class EBookController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="api/ebooks/update/{id}")
 	public ResponseEntity<EBookDTO> updateEbook(@RequestBody EBookDTO bookDTO,@PathVariable Integer id){
 		

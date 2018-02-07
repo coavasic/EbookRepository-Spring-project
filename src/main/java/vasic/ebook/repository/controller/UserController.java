@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -115,6 +116,7 @@ public class UserController {
 		
 	}
 	
+	@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="/api/promote/{username}",method=RequestMethod.GET)
 	public ResponseEntity<?> promote(@PathVariable String username){
 		
@@ -128,6 +130,16 @@ public class UserController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 		}			
+	}
+	
+	@RequestMapping(value="open/username")
+	public String getLoged() {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		System.out.println(auth.getPrincipal());
+		
+		return auth.getPrincipal().toString();
+		
 	}
 	
 	@RequestMapping(value="/api/user/delete/{username}")
