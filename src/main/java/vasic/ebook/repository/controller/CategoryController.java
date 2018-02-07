@@ -62,6 +62,18 @@ public class CategoryController {
 		
 	}
 	
+	@GetMapping("/open/categories/{id}")
+	public ResponseEntity<Category> getCatById(@PathVariable Integer id){
+		
+		Category category = categoryService.findOne(id);
+		if(category!=null) {
+			return new ResponseEntity<Category>(category,HttpStatus.OK);
+		}
+		
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		
+	}
+	
 	@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="api/categories/delete/{id}")
 	public ResponseEntity<?> delete(@PathVariable Integer id){

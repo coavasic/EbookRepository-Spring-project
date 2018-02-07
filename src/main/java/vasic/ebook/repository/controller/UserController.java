@@ -17,7 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 import vasic.ebook.repository.dto.AppUserDTO;
 import vasic.ebook.repository.entity.AppUser;
 import vasic.ebook.repository.entity.Category;
+import vasic.ebook.repository.entity.InfoChange;
+import vasic.ebook.repository.entity.PasswordChange;
 import vasic.ebook.repository.repository.AppUserRepo;
 import vasic.ebook.repository.repository.CategoryRepo;
 
@@ -48,29 +52,25 @@ public class UserController {
 	@RequestMapping(value="/sign-up",method=RequestMethod.POST)
 	public ResponseEntity<AppUserDTO> signUp(@RequestBody AppUserDTO userDTO){
 		
-		
-		
 		AppUser user = new AppUser();
+		if(isUsernameUnique(userDTO.getUsername())) {
+			user.setFirstName(userDTO.getFirstName());
+			user.setLastName(userDTO.getLastName());
+			user.setUsername(userDTO.getUsername());
+			System.out.println(userDTO.getPassword());
+			user.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
+			user.setRole("user");
+			if(userDTO.getCategoryId()==0) {
+				user.setCategory(null);
+			}else {
+				user.setCategory(categoryRepo.findOne(userDTO.getCategoryId()));
+			}
+			
+			return new ResponseEntity<AppUserDTO>(new AppUserDTO(userRepo.save(user)),HttpStatus.OK);
+			}
+		
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-		user.setFirstName(userDTO.getFirstName());
-		user.setLastName(userDTO.getLastName());
-		user.setUsername(userDTO.getUsername());
-		System.out.println(userDTO.getPassword());
-		user.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
-		user.setRole("user");
-		if(userDTO.getCategoryId()==0) {
-			user.setCategory(null);
-		}else {
-			user.setCategory(categoryRepo.findOne(userDTO.getCategoryId()));
-		}
-		
-		
-		return new ResponseEntity<AppUserDTO>(new AppUserDTO(userRepo.save(user)),HttpStatus.OK);
-		
-		
-		
-		
-		
 	}
 	
 	
@@ -156,6 +156,75 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 		}
 		
+		
+	}
+	
+	@RequestMapping(value="/api/user/changePassword",method=RequestMethod.POST)
+	public ResponseEntity<?> changeMyPassword(@RequestBody PasswordChange passwordChange){
+		
+		AppUser user = userRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+		if(passwordChange.getPassword().equals(passwordChange.getConfirmPassword())) {
+			
+			user.setPassword(bCryptPasswordEncoder.encode(passwordChange.getPassword()));
+			userRepo.save(user);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		
+	}
+	
+	@PostMapping("/api/user/changeMyInfo")
+	public ResponseEntity<?> changeMyInfo(@RequestBody InfoChange infoChange){
+		
+		AppUser user = userRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+		
+		if(isUsernameUnique(infoChange.getUsername())) {
+			
+			user.setFirstName(infoChange.getFirstName());
+			user.setLastName(infoChange.getLastName());
+			user.setUsername(infoChange.getUsername());
+			if(infoChange.getCategoryId()==0) {
+				user.setCategory(null);
+			}else {
+				user.setCategory(categoryRepo.findOne(infoChange.getCategoryId()));
+			}
+			
+			userRepo.save(user);
+			
+			return new ResponseEntity<>(HttpStatus.OK);
+			
+			
+		}
+		
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		
+		
+	}
+	
+	@GetMapping("/api/user/myInfo")
+	public ResponseEntity<AppUserDTO> getMyInfo(){
+		
+		AppUser user = userRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+		if(user != null) {
+			AppUserDTO dto = new AppUserDTO(user);
+			System.out.println("Id kategorije: "+dto.getCategoryId());
+			return new ResponseEntity<AppUserDTO>(new AppUserDTO(user),HttpStatus.OK);
+			
+		}
+		
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		
+	}
+	
+	private boolean isUsernameUnique(String username){
+		
+		AppUser user = userRepo.findByUsername(username);
+		if(user == null) {
+			return true;
+		}
+		
+		return false;
 		
 	}
 	

@@ -148,17 +148,13 @@ public class EBookController {
 	public ResponseEntity<EBookDTO> saveEbook(@RequestBody EBookDTO bookDTO) throws ParseException, IOException{
 		
 		PDFHandler handler = new PDFHandler();
-
 		
 		Category category = categoryService.findOne(bookDTO.getCategoryId());
 		Language language = languageService.findOne(bookDTO.getLanguageId());
 		
         String fileLocation= new File("data").getAbsolutePath()+"\\"+bookDTO.getFileName();
         String fileLocation1= new File("books").getAbsolutePath()+"\\"+bookDTO.getFileName();
-
-
-
-		
+	
 		File pdfFile = new File(fileLocation);
 		
 		PDDocument doc = handler.setAttributes(pdfFile,bookDTO);
@@ -172,9 +168,7 @@ public class EBookController {
 		
 		//deleting temporary file
 		pdfFile.delete();
-		
-		
-		
+
 		EBook book = new EBook();
 		book.setTitle(bookDTO.getTitle());
 		book.setAuthor(bookDTO.getAuthor());
@@ -212,9 +206,7 @@ public class EBookController {
 			
 			return new ResponseEntity<byte[]>(content,headers,HttpStatus.OK);
 				
-
-			
-			
+				
 		}
 		
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
