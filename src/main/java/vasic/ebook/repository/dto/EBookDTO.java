@@ -5,6 +5,7 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import vasic.ebook.repository.entity.EBook;
+import vasic.ebook.repository.lucene.model.IndexUnit;
 
 public class EBookDTO implements Serializable{
 	
@@ -31,6 +32,17 @@ public class EBookDTO implements Serializable{
 		this.fileName = book.getFileName();
 		this.categoryId = book.getCategory().getId();
 		this.languageId=book.getLanguage().getId();
+		
+	}
+	
+	public EBookDTO(IndexUnit indexUnit, String fileName) {
+		
+		this.setTitle(indexUnit.getTitle());
+		Integer pubYear = Integer.parseInt(indexUnit.getFiledate().substring(0, 4));
+		this.setPublicationYear(pubYear);
+		this.setKeywords(indexUnit.getKeywords());
+		this.setAuthor(indexUnit.getAuthor());
+		this.setFileName(fileName);
 		
 	}
 

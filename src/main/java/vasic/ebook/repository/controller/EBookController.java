@@ -76,23 +76,11 @@ public class EBookController {
 	public ResponseEntity<EBookDTO> checkbeforeUpload(@RequestParam("file") MultipartFile file) throws IOException{
 				
 		if(file.getOriginalFilename().endsWith("pdf")) {
-			
-			EBookDTO ebook = new EBookDTO();
-
 			File pdfFile = fileManager.saveToTemp(file);
-
 			PDFHandler handler = new PDFHandler();
 			IndexUnit indexUnit = handler.getIndexUnit(pdfFile);
-			System.out.println(indexUnit.getFiledate());
-			ebook.setTitle(indexUnit.getTitle());
-			Integer pubYear = Integer.parseInt(indexUnit.getFiledate().substring(0, 4));
-			ebook.setPublicationYear(pubYear);
-			ebook.setKeywords(indexUnit.getKeywords());
-			ebook.setAuthor(indexUnit.getAuthor());
-			ebook.setFileName(file.getOriginalFilename());
-			
-			
-			return new ResponseEntity<EBookDTO>(ebook,HttpStatus.OK);
+					
+			return new ResponseEntity<EBookDTO>(new EBookDTO(indexUnit,file.getOriginalFilename()),HttpStatus.OK);
 		}		
 		else {			
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

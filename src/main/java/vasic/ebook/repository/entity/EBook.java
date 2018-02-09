@@ -22,7 +22,7 @@ public class EBook implements Serializable{
 	private Integer id;
 	
 	
-	@Size(max=30)
+	@Size(max=120)
 	@Column(name="title")
 	private String title;
 	
