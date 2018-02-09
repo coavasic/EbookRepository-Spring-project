@@ -36,6 +36,7 @@ import vasic.ebook.repository.entity.AppUser;
 import vasic.ebook.repository.entity.Category;
 import vasic.ebook.repository.entity.EBook;
 import vasic.ebook.repository.entity.Language;
+import vasic.ebook.repository.file.FileManager;
 import vasic.ebook.repository.indexer.Indexer;
 import vasic.ebook.repository.lucene.indexing.handlers.PDFHandler;
 import vasic.ebook.repository.lucene.model.IndexUnit;
@@ -66,6 +67,9 @@ public class EBookController {
 	@Autowired
 	private EBookRepo  ebookRepo;
 	
+	@Autowired
+	private FileManager fileManager;
+	
 	
 	@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="/api/ebooks/upload",method=RequestMethod.POST,consumes = "multipart/form-data")
@@ -74,17 +78,8 @@ public class EBookController {
 		if(file.getOriginalFilename().endsWith("pdf")) {
 			
 			EBookDTO ebook = new EBookDTO();
-			
-			
-	        String fileLocation= new File("data").getAbsolutePath()+"\\"+file.getOriginalFilename();
 
-			if (! file.isEmpty()) {
-	            byte[] bytes = file.getBytes();
-	          	FileOutputStream fos = new FileOutputStream(fileLocation);
-	          	fos.write(bytes);
-	          	fos.close();
-			}
-			File pdfFile = new File(fileLocation);
+			File pdfFile = fileManager.saveToTemp(file);
 
 			PDFHandler handler = new PDFHandler();
 			IndexUnit indexUnit = handler.getIndexUnit(pdfFile);
@@ -158,7 +153,6 @@ public class EBookController {
 		File pdfFile = new File(fileLocation);
 		
 		PDDocument doc = handler.setAttributes(pdfFile,bookDTO);
-		
 		indexer.add(handler.getIndexUnit(pdfFile));
 		
 		File f = new File(fileLocation1);
