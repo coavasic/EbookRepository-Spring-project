@@ -24,6 +24,8 @@ public class CategoryController {
 	
 	@Autowired
 	CategoryService categoryService;
+
+
 	
 	@RequestMapping(value="open/categories/all",method=RequestMethod.GET)
 	public ResponseEntity<List<Category>> getCategories(){
