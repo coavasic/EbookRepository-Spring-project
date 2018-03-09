@@ -21,7 +21,7 @@ public class QueryBuilder {
 		QueryBuilder.maxEdits = maxEdits;
 	}
 	
-	public static org.elasticsearch.index.query.QueryBuilder buildQuery(SearchType queryType, String field, String value) throws IllegalArgumentException, ParseException{
+	public static org.elasticsearch.index.query.QueryBuilder buildQuery(String queryType, String field, String value) throws IllegalArgumentException, ParseException{
 		String errorMessage = "";
 		if(field == null || field.equals("")){
 			errorMessage += "Field not specified";
@@ -35,13 +35,13 @@ public class QueryBuilder {
 		}
 		
 		org.elasticsearch.index.query.QueryBuilder retVal = null;
-		if(queryType.equals(SearchType.regular)){
+		if(queryType.equals("regular")){
 			retVal = QueryBuilders.termQuery(field, value);
-		}else if(queryType.equals(SearchType.fuzzy)){
+		}else if(queryType.equals("fuzzy")){
 			retVal = QueryBuilders.fuzzyQuery(field, value).fuzziness(Fuzziness.fromEdits(maxEdits));
-		}else if(queryType.equals(SearchType.prefix)){
+		}else if(queryType.equals("prefix")){
 			retVal = QueryBuilders.prefixQuery(field, value);
-		}else if(queryType.equals(SearchType.range)){
+		}else if(queryType.equals("range")){
 			String[] values = value.split(" ");
 			retVal = QueryBuilders.rangeQuery(field).from(values[0]).to(values[1]);
 		}else{

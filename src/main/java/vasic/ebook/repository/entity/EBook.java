@@ -35,7 +35,7 @@ public class EBook implements Serializable{
 	@Column(name="keywords")
 	private String keywords;
 	
-	@Column(name="publication_year")
+	@Column(name="publication_year",columnDefinition="YEAR")
 	private Integer publicationYear;
 	
 	@Size(max=200)

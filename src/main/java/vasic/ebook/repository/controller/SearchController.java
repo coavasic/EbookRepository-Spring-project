@@ -12,6 +12,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,50 +42,16 @@ public class SearchController {
 	@Autowired
 	EBookRepo ebookRepo;
 
-	@PostMapping(value="/search/term", consumes="application/json")
-	public ResponseEntity<List<EBookDTO>> searchTermQuery(@RequestBody SimpleQuery simpleQuery) throws Exception {		
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.regular, simpleQuery.getField(), normalize(simpleQuery.getValue()));
+	
+	@PostMapping(value="/search/{searchType}")
+	public ResponseEntity<List<EBookDTO>> search(@RequestBody SimpleQuery simpleQuery,@PathVariable String searchType) throws Exception {		
+		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(searchType, simpleQuery.getField(), normalize(simpleQuery.getValue()));
 		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
 		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
 		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
 		return new ResponseEntity<List<EBookDTO>>(ebooks, HttpStatus.OK);
 	}
 	
-	@PostMapping(value="/search/fuzzy", consumes="application/json")
-	public ResponseEntity<List<EBookDTO>> searchFuzzy(@RequestBody SimpleQuery simpleQuery) throws Exception {
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.fuzzy, simpleQuery.getField(), normalize(simpleQuery.getValue()));
-		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
-		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
-		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
-		return new ResponseEntity<List<EBookDTO>>(ebooks, HttpStatus.OK);
-	}
-	
-	@PostMapping(value="/search/prefix", consumes="application/json")
-	public ResponseEntity<List<EBookDTO>> searchPrefix(@RequestBody SimpleQuery simpleQuery) throws Exception {
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.prefix, simpleQuery.getField(), normalize(simpleQuery.getValue()));
-		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
-		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
-		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
-		return new ResponseEntity<List<EBookDTO>>(ebooks, HttpStatus.OK);
-	}
-	
-	@PostMapping(value="/search/range", consumes="application/json")
-	public ResponseEntity<List<EBookDTO>> searchRange(@RequestBody SimpleQuery simpleQuery) throws Exception {
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.range, simpleQuery.getField(), normalize(simpleQuery.getValue()));
-		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
-		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
-		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
-		return new ResponseEntity<List<EBookDTO>>(ebooks, HttpStatus.OK);
-	}
-	
-	@PostMapping(value="/search/phrase", consumes="application/json")
-	public ResponseEntity<List<EBookDTO>> searchPhrase(@RequestBody SimpleQuery simpleQuery) throws Exception {
-		org.elasticsearch.index.query.QueryBuilder query= QueryBuilder.buildQuery(SearchType.phrase, simpleQuery.getField(), normalize(simpleQuery.getValue()));
-		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
-		rh.add(new RequiredHighlight(simpleQuery.getField(), simpleQuery.getValue()));
-		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
-		return new ResponseEntity<List<EBookDTO>>(ebooks, HttpStatus.OK);
-	}
 	
 //	@PostMapping(value="/search/boolean", consumes="application/json")
 //	public ResponseEntity<List<ResultData>> searchBoolean(@RequestBody AdvancedQuery advancedQuery) throws Exception {
@@ -111,7 +78,7 @@ public class SearchController {
 //	}
 	
 	@RequestMapping(value="/search/queryParser",method=RequestMethod.POST, consumes="application/json")
-	public ResponseEntity<List<EBookDTO>> search(@RequestBody SimpleQuery simpleQuery) throws Exception {
+	public ResponseEntity<List<EBookDTO>> search1(@RequestBody SimpleQuery simpleQuery) throws Exception {
 		org.elasticsearch.index.query.QueryBuilder query=QueryBuilders.queryStringQuery(simpleQuery.getValue());			
 		List<RequiredHighlight> rh = new ArrayList<RequiredHighlight>();
 		List<EBookDTO> ebooks = resultRetriever.getResults(query, rh);
