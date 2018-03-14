@@ -128,7 +128,7 @@ public class EBookController {
 	
 	
 	@RequestMapping(value="api/ebooks/dodaj",method=RequestMethod.POST,consumes="application/json")
-	public ResponseEntity<EBookDTO> saveEbook(@RequestBody EBookDTO bookDTO) throws ParseException, IOException{
+	public ResponseEntity<EBookDTO> saveEbook(@RequestBody EBookDTO bookDTO) throws Exception{
 		
 		PDFHandler handler = new PDFHandler();
 		
@@ -145,6 +145,17 @@ public class EBookController {
 		
 		File f = new File(fileLocation1);
 		FileOutputStream fOut = new FileOutputStream(f);
+		
+		if (doc.isEncrypted()) {
+	        try {
+	           
+	            doc.setAllSecurityToBeRemoved(true);
+	        }
+	        catch (Exception e) {
+	            throw new Exception("The document is encrypted, and we can't decrypt it.", e);
+	        }
+	    }
+		
 		doc.save(fOut);
 		doc.close();
 		
