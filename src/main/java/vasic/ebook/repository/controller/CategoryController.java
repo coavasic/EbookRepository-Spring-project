@@ -2,6 +2,8 @@ package vasic.ebook.repository.controller;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,7 @@ public class CategoryController {
 	@Autowired
 	CategoryService categoryService;
 
-
+	private Logger logger = LogManager.getLogger(this.getClass());
 	
 	@RequestMapping(value="open/categories/all",method=RequestMethod.GET)
 	public ResponseEntity<List<Category>> getCategories(){
@@ -43,9 +45,12 @@ public class CategoryController {
 	
 	@RequestMapping(value="api/categories/add",method=RequestMethod.POST)
 	public ResponseEntity<Category> add(@RequestBody Category category){
-		
-		return new ResponseEntity<Category>(this.categoryService.save(category),HttpStatus.OK);
-		
+		if(category != null) {
+			logger.info("Kategorija dodata");
+			return new ResponseEntity<Category>(this.categoryService.save(category), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 	
 	@PreAuthorize("hasAuthority('admin')")

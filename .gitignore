@@ -23,4 +23,5 @@ dist/
 nbdist/
 data/
 books/
+data/elasticsearch/nodes/0
 .nb-gradle/
