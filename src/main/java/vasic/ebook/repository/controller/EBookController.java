@@ -1,35 +1,14 @@
 package vasic.ebook.repository.controller;
 
-import java.io.File;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.security.auth.message.callback.SecretKeyCallback.Request;
-
 import org.apache.pdfbox.pdmodel.PDDocument;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vasic.ebook.repository.dto.EBookDTO;
 import vasic.ebook.repository.entity.AppUser;
@@ -45,6 +24,15 @@ import vasic.ebook.repository.repository.EBookRepo;
 import vasic.ebook.repository.service.CategoryService;
 import vasic.ebook.repository.service.EBookService;
 import vasic.ebook.repository.service.LanguageService;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class EBookController {
@@ -73,9 +61,10 @@ public class EBookController {
 	
 	@PreAuthorize("hasAuthority('admin')")
 	@RequestMapping(value="/api/ebooks/upload",method=RequestMethod.POST,consumes = "multipart/form-data")
-	public ResponseEntity<EBookDTO> checkbeforeUpload(@RequestParam("file") MultipartFile file) throws IOException{
-				
-		if(file.getOriginalFilename().endsWith("pdf")) {
+    public ResponseEntity<EBookDTO> checkbeforeUpload(@RequestParam("file") MultipartFile file) {
+
+
+        if (file.getOriginalFilename().endsWith("pdf") && ebookExist(file.getOriginalFilename())) {
 			File pdfFile = fileManager.saveToTemp(file);
 			PDFHandler handler = new PDFHandler();
 			IndexUnit indexUnit = handler.getIndexUnit(pdfFile);
@@ -86,6 +75,11 @@ public class EBookController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
+
+    private boolean ebookExist(String fileName) {
+
+        return ebookRepo.findByFileName(fileName) == null;
+    }
 	
 	
 	@RequestMapping(value="open/ebooks",method=RequestMethod.GET)

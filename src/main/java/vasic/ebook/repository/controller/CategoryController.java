@@ -1,24 +1,16 @@
 package vasic.ebook.repository.controller;
 
-import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import vasic.ebook.repository.entity.Category;
 import vasic.ebook.repository.service.CategoryService;
+
+import java.util.List;
 
 @RestController
 public class CategoryController {
@@ -27,8 +19,6 @@ public class CategoryController {
 	@Autowired
 	CategoryService categoryService;
 
-	private Logger logger = LogManager.getLogger(this.getClass());
-	
 	@RequestMapping(value="open/categories/all",method=RequestMethod.GET)
 	public ResponseEntity<List<Category>> getCategories(){
 		
@@ -46,7 +36,6 @@ public class CategoryController {
 	@RequestMapping(value="api/categories/add",method=RequestMethod.POST)
 	public ResponseEntity<Category> add(@RequestBody Category category){
 		if(category != null) {
-			logger.info("Kategorija dodata");
 			return new ResponseEntity<Category>(this.categoryService.save(category), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
