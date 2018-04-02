@@ -20,47 +20,20 @@ import java.util.Calendar;
 
 public class PDFHandler extends DocumentHandler {
 
-	@Override
-	public IndexUnit getIndexUnit(File file) {
+
+	public IndexUnit getIndexUnitWithNewArgs(File file, EBookDTO eBookDTO) {
 		IndexUnit retVal = new IndexUnit();
-		String modificationDate="";
 		try {
 			PDFParser parser = new PDFParser(new RandomAccessFile(file, "r"));
 			parser.parse();
-			String text = Normalizer.normalize(CyrillicLatinConverter.cir2lat(getText(parser)),Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-			retVal.setText(text);
-			System.out.println(text);
+			retVal.setText(Normalizer.normalize(CyrillicLatinConverter.cir2lat(getText(parser)), Form.NFD).replaceAll("[^\\p{ASCII}]", ""));
 
-			// metadata extraction
-			PDDocument pdf = parser.getPDDocument();
-			PDDocumentInformation info = pdf.getDocumentInformation();
-			
-			pdf.setDocumentInformation(info);
+			retVal.setTitle(eBookDTO.getTitle());
+			retVal.setAuthor(eBookDTO.getAuthor());
+			retVal.setFiledate(eBookDTO.getPublicationYear().toString());
+			retVal.setKeywords(eBookDTO.getKeywords());
+			retVal.setFilename(eBookDTO.getFileName());
 
-			String title = info.getTitle();
-			retVal.setTitle(title);
-			
-			String author = info.getAuthor();
-			retVal.setAuthor(author);
-
-			String keywords = info.getKeywords();
-			
-		
-
-		
-			
-			
-			retVal.setKeywords(keywords);
-			retVal.setFilename(file.getCanonicalPath());
-			if(info.getCreationDate() != null) {
-			modificationDate=""+info.getCreationDate().get(Calendar.YEAR);
-			}else {
-				modificationDate="0000";
-			}
-			
-			retVal.setFiledate(modificationDate);
-			
-			pdf.close();
 		} catch (IOException e) {
 			System.out.println("Greksa pri konvertovanju dokumenta u pdf");
 		}
@@ -68,11 +41,10 @@ public class PDFHandler extends DocumentHandler {
 		return retVal;
 	}
 
+
 	public EBookDTO getPdfMetaData(File file, String fileName) {
 
 		EBookDTO eBookDTO = new EBookDTO();
-		String modificationDate = "";
-
 		try {
 
 			PDFParser parser = new PDFParser(new RandomAccessFile(file, "r"));
@@ -128,12 +100,46 @@ public class PDFHandler extends DocumentHandler {
 
 		
 	}
-		
-		
-		
-		
-		
-	
+
+
+	@Override
+	public IndexUnit getIndexUnit(File file) {
+
+		IndexUnit retVal = new IndexUnit();
+		String creationDate = "";
+
+		try {
+
+
+			PDFParser parser = new PDFParser(new RandomAccessFile(file, "r"));
+			parser.parse();
+			String text = Normalizer.normalize(CyrillicLatinConverter.cir2lat(getText(parser)), Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+			// metadata extraction
+			PDDocument pdf = parser.getPDDocument();
+			PDDocumentInformation info = pdf.getDocumentInformation();
+
+			retVal.setTitle(info.getTitle());
+			retVal.setAuthor(info.getAuthor());
+			retVal.setKeywords(info.getKeywords());
+			retVal.setFilename(file.getCanonicalPath());
+			if (info.getCreationDate() != null) {
+				creationDate = "" + info.getCreationDate().get(Calendar.YEAR);
+			} else {
+				creationDate = "1389";
+			}
+
+			retVal.setFiledate(creationDate);
+
+			pdf.close();
+
+
+		} catch (IOException e) {
+
+			System.out.println("Greska pri konvertovanju fajla u pdf");
+		}
+
+		return retVal;
+	}
 
 	@Override
 	public String getText(File file) {
@@ -148,7 +154,7 @@ public class PDFHandler extends DocumentHandler {
 		}
 		return null;
 	}
-	
+
 	public String getText(PDFParser parser) {
 		try {
 			PDFTextStripper textStripper = new PDFTextStripper();

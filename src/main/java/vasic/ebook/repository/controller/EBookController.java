@@ -124,21 +124,28 @@ public class EBookController {
 	public ResponseEntity<EBookDTO> saveEbook(@RequestBody EBookDTO bookDTO) throws Exception{
 		
 		PDFHandler handler = new PDFHandler();
-		
+
+		//find language and category
 		Category category = categoryService.findOne(bookDTO.getCategoryId());
 		Language language = languageService.findOne(bookDTO.getLanguageId());
-		
-        String fileLocation= new File("data").getAbsolutePath()+"\\"+bookDTO.getFileName();
-        String fileLocation1= new File("books").getAbsolutePath()+"\\"+bookDTO.getFileName();
-	
-		File pdfFile = new File(fileLocation);
-		
+
+		String fileLocationTemp = new File("data").getAbsolutePath() + "\\" + bookDTO.getFileName();
+		String fileLocation = new File("books").getAbsolutePath() + "\\" + bookDTO.getFileName();
+
+		//read file from temp location
+		File pdfFile = new File(fileLocationTemp);
+
+		//set new attributes
 		PDDocument doc = handler.setAttributes(pdfFile,bookDTO);
-		indexer.add(handler.getIndexUnit(pdfFile));
-		
-		File f = new File(fileLocation1);
+
+		//index pdf file with new attributes
+		indexer.add(handler.getIndexUnitWithNewArgs(pdfFile, bookDTO));
+
+		File f = new File(fileLocation);
 		FileOutputStream fOut = new FileOutputStream(f);
-		
+
+
+		//decrypt file if encrypted
 		if (doc.isEncrypted()) {
 	        try {
 	           
@@ -257,8 +264,8 @@ public class EBookController {
 			File pdfFile = new File(fileLocation1);
 			try {
 			PDDocument doc = handler.setAttributes(pdfFile,bookDTO);
-			
-			indexer.update(handler.getIndexUnit(pdfFile));
+
+				indexer.update(handler.getIndexUnitWithNewArgs(pdfFile, bookDTO));
 			
 			File f = new File(fileLocation1);
 			FileOutputStream fOut = new FileOutputStream(f);
