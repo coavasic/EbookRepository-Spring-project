@@ -18,7 +18,6 @@ import vasic.ebook.repository.entity.Language;
 import vasic.ebook.repository.file.FileManager;
 import vasic.ebook.repository.indexer.Indexer;
 import vasic.ebook.repository.lucene.indexing.handlers.PDFHandler;
-import vasic.ebook.repository.lucene.model.IndexUnit;
 import vasic.ebook.repository.repository.AppUserRepo;
 import vasic.ebook.repository.repository.EBookRepo;
 import vasic.ebook.repository.service.CategoryService;
@@ -67,9 +66,9 @@ public class EBookController {
         if (file.getOriginalFilename().endsWith("pdf") && ebookExist(file.getOriginalFilename())) {
 			File pdfFile = fileManager.saveToTemp(file);
 			PDFHandler handler = new PDFHandler();
-			IndexUnit indexUnit = handler.getIndexUnit(pdfFile);
-					
-			return new ResponseEntity<EBookDTO>(new EBookDTO(indexUnit,file.getOriginalFilename()),HttpStatus.OK);
+			EBookDTO ebookDTO = handler.getPdfMetaData(pdfFile, file.getOriginalFilename());
+
+			return new ResponseEntity<EBookDTO>(ebookDTO, HttpStatus.OK);
 		}		
 		else {			
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
