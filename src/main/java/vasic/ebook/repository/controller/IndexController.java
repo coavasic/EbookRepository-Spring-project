@@ -19,7 +19,7 @@ import vasic.ebook.repository.indexer.Indexer;
 
 
 @RestController
-@RequestMapping(value="open")
+@RequestMapping(value="api")
 public class IndexController {
 	
 	private static String DATA_DIR_PATH;
@@ -36,14 +36,14 @@ public class IndexController {
 	
 	@PreAuthorize("hasAuthority('admin')")
 	@GetMapping("/reindex")
-	public ResponseEntity<String> index() throws IOException {
+	public ResponseEntity<?> index() throws IOException {
 		File dataDir = new File("books");
 		long start = new Date().getTime();
 		int numIndexed = indexer.index(dataDir);
 		long end = new Date().getTime();
 		String text = "Indexing " + numIndexed + " files took "
 				+ (end - start) + " milliseconds";
-		return new ResponseEntity<String>(text, HttpStatus.OK);
+		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 	
 	
