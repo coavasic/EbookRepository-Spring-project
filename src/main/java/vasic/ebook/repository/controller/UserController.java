@@ -1,5 +1,6 @@
 package vasic.ebook.repository.controller;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -179,7 +180,7 @@ public class UserController {
 		
 		AppUser user = userRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
 		
-		if(isUsernameUnique(infoChange.getUsername())) {
+		if(isUsernameUnique(infoChange.getUsername()) || infoChange.getUsername().equals(user.getUsername())) {
 			
 			user.setFirstName(infoChange.getFirstName());
 			user.setLastName(infoChange.getLastName());
